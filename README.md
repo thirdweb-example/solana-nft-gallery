@@ -1,20 +1,118 @@
-## Solana frontend started kit
+# Solana NFT Gallery
 
-This template has everything you need to build a web3 app on Solana using the thirdweb SDK.
+Create a web application that showcases all of the NFTs that have been minted into an [NFT Collection Program](https://portal.thirdweb.com/pre-built-contracts/solana/nft-collection) on the Solana network!
 
 ## Getting Started
 
 Create a project using this example:
 
 ```bash
-npx thirdweb create --template next-typescript-solana-starter
+npx thirdweb create --template solana-nft-gallery
 ```
 
-You can start editing the page by modifying `pages/index.tsx`. The page auto-updates as you edit the file.
+Edit the `PROGRAM_ADDRESS` variable on the `_app.tsx` and `index.tsx` pages to be your programs address.
 
-On `pages/_app.tsx`, you'll find our `ThirdwebProvider` wrapping your app, this is necessary for our hooks to work.
+## Guide
 
-on `pages/index.tsx`, you'll find an example of a connect wallet button and some hooks.
+Below we'll explore the key areas of the codebase.
+
+### Reading Program Info
+
+First, we connect to our program using the `useProgram` hook:
+
+```jsx
+const { data: program } = useProgram(PROGRAM_ADDRESS, "nft-collection");
+```
+
+From here, we can read information about the program itself as well as information about the NFTs within it:
+
+```jsx
+const { data: metadata, isLoading: loadingMetadata } =
+  useProgramMetadata(program);
+const { data: nfts, isLoading } = useNFTs(program);
+```
+
+No we have the metadata of the program in the `metadata` field and an array of NFTs inside the `nft` field!
+
+### Rendering NFTs
+
+On the UI, we iterate over the `nfts` array and transform each NFT into a `Card` component:
+
+```jsx
+{
+  isLoading ? (
+    <p>Loading...</p>
+  ) : (
+    <main className={styles.gallery}>
+      {nfts?.map((nft, idx) => (
+        <Card key={idx} nft={nft} />
+      ))}
+    </main>
+  );
+}
+```
+
+The `Card` component is a simple component that renders the NFT metadata and owner:
+
+```jsx
+import { NFT } from "@thirdweb-dev/sdk";
+import { FC } from "react";
+import styles from "../styles/Home.module.css";
+
+type Props = {
+  nft: NFT,
+};
+
+// revealed address character count
+const REVEALED_COUNT = 4;
+
+const Card: FC<Props> = ({ nft }) => {
+  return (
+    <div className={styles.card}>
+      <img className={styles.thumbnail} src={nft.metadata.image || ""} />
+      <h3>{nft.metadata.name}</h3>
+      <p>Owned by</p>
+      <p>
+        {nft.owner.substring(0, REVEALED_COUNT) +
+          "..." +
+          nft.owner.substring(nft.owner.length - REVEALED_COUNT)}
+      </p>
+    </div>
+  );
+};
+
+export default Card;
+```
+
+### Minting New NFTs
+
+You can also mint new NFTs into the program directly from the application:
+
+```jsx
+const MintButton = () => {
+  const { mutateAsync: mintNft, isLoading } = useMintNFT(program);
+
+  const mint = async () => {
+    if (!metadata || !nfts) return;
+
+    await mintNft({
+      metadata: {
+        name: metadata.name + `#${nfts.length + 1}`,
+        description: metadata.description,
+        image: metadata.image,
+      },
+    });
+  };
+
+  return (
+    <button onClick={mint} className={styles.mintButton}>
+      {isLoading ? "Minting..." : "Mint"}
+    </button>
+  );
+};
+
+export default MintButton;
+```
 
 ## Learn More
 
@@ -30,3 +128,7 @@ You can check out [the thirdweb GitHub organization](https://github.com/thirdweb
 ## Join our Discord!
 
 For any questions, suggestions, join our discord at [https://discord.gg/thirdweb](https://discord.gg/thirdweb).
+
+```
+
+```
