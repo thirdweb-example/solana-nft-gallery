@@ -1,3 +1,4 @@
+import { ThirdwebNftMedia } from "@thirdweb-dev/react";
 import { NFT } from "@thirdweb-dev/sdk";
 import { FC } from "react";
 import styles from "../styles/Home.module.css";
@@ -12,7 +13,7 @@ const REVEALED_COUNT = 4;
 const Card: FC<Props> = ({ nft }) => {
   return (
     <div className={styles.card}>
-      <img className={styles.thumbnail} src={nft.metadata.image || ""} />
+      <ThirdwebNftMedia className={styles.thumbnail} metadata={nft.metadata} />
       <h3>{nft.metadata.name}</h3>
       <p>Owned by</p>
       <p>

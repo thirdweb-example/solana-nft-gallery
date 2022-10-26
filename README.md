@@ -52,24 +52,13 @@ On the UI, we iterate over the `nfts` array and transform each NFT into a `Card`
 }
 ```
 
-The `Card` component is a simple component that renders the NFT metadata and owner:
+The `Card` component is a simple component that renders the NFT metadata and owner, making use of the [ThirdwebNftMedia](https://portal.thirdweb.com/ui-components/nft-renderer) UI component to display all kinds of NFTs:
 
 ```jsx
-import { NFT } from "@thirdweb-dev/sdk";
-import { FC } from "react";
-import styles from "../styles/Home.module.css";
-
-type Props = {
-  nft: NFT,
-};
-
-// revealed address character count
-const REVEALED_COUNT = 4;
-
 const Card: FC<Props> = ({ nft }) => {
   return (
     <div className={styles.card}>
-      <img className={styles.thumbnail} src={nft.metadata.image || ""} />
+      <ThirdwebNftMedia className={styles.thumbnail} metadata={nft.metadata} />
       <h3>{nft.metadata.name}</h3>
       <p>Owned by</p>
       <p>
@@ -80,8 +69,6 @@ const Card: FC<Props> = ({ nft }) => {
     </div>
   );
 };
-
-export default Card;
 ```
 
 ### Minting New NFTs
